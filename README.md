@@ -1,3 +1,7 @@
+# Changes in this fork:
+- create\_diagram() now reads in polygons of obstacles instead of a list of points to avoid
+- handle\_circle\_event now checks if node to be added to graph is inside an obstacle, if it is it will not at the node and removes all edges that were going to connect to it
+
 # Foronoi
 **F**ortune's algorithm for V**oronoi** diagrams. 
 
