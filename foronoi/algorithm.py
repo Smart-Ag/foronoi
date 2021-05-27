@@ -85,6 +85,9 @@ class Algorithm(Subject):
         # Whether to remove zero length edges
         self.remove_zero_length_edges = remove_zero_length_edges
 
+        # store obstacle polygons for collision detection
+        self.obstacle_polygons = None
+
     @property
     def arcs(self) -> List[Arc]:
         return list(self._arcs)
@@ -119,7 +122,7 @@ class Algorithm(Subject):
 
         return self.event_queue
 
-    def create_diagram(self, points: list):
+    def create_diagram(self, obstacle_polys: list, boundary: Polygon):
         """
         Create the Voronoi diagram.
 
@@ -148,7 +151,17 @@ class Algorithm(Subject):
         Output. The Voronoi diagram `Vor(P)` given inside a bounding box in a doublyconnected edge list `D`.
         """
 
-        points = [Point(x, y) for x, y in points]
+
+        # generate list of points to avoid from polygons defining obstacles and boundary polygon
+        points = []
+        for coord in boundary.points:
+            points.append( Point(coord.x, coord.y) )
+        for obstacle in obstacle_polys:
+            for coord in obstacle.points:
+                points.append( Point(coord.x, coord.y) )
+
+        # store for collision detection (of graph nodes & edges) later on
+        self.obstacle_polygons = obstacle_polys
 
         # Initialize all points
         self.initialize(points)
@@ -203,6 +216,8 @@ class Algorithm(Subject):
 
             self.event = event
             self.notify_observers(Message.STEP_FINISHED)
+
+            print("")
 
         self.notify_observers(Message.DEBUG, payload="# Sweep finished")
         self.notify_observers(Message.SWEEP_FINISHED)
@@ -260,6 +275,8 @@ class Algorithm(Subject):
             self.status_tree = LeafNode(new_arc)
             return
 
+        print(Tree.get_leaves(root=self.status_tree))
+
         # 2. Search the beach line tree for the arc above the point
         arc_node_above_point = Tree.find_leaf_node(self.status_tree, key=point_i.xd, sweep_line=self.sweep_line)
         arc_above_point = arc_node_above_point.get_value()
@@ -278,6 +295,8 @@ class Algorithm(Subject):
         #                  /       \
         #                p_i       p_j
         point_j = arc_above_point.origin
+        print("could be it", point_j)
+        # this is where it all goes wrong, point_j should be P11 but it is P9
         breakpoint_left = Breakpoint(breakpoint=(point_j, point_i))
         breakpoint_right = Breakpoint(breakpoint=(point_i, point_j))
 
@@ -299,12 +318,16 @@ class Algorithm(Subject):
         AB = breakpoint_left
         BA = breakpoint_right
 
+        # print("hmmm", A.xy, B.xy) # not helpful
+
         # Edge AB -> BA with incident point B
         AB.edge = HalfEdge(B, origin=AB)
 
         # Edge BA -> AB with incident point A
         BA.edge = HalfEdge(A, origin=BA, twin=AB.edge)
 
+        print("waaa?", AB.edge.origin)
+        print(AB.edge.origin.breakpoint)
         # Append one of the edges to the list (we can get the other by using twin)
         self.edges.append(AB.edge)
 
@@ -396,10 +419,33 @@ class Algorithm(Subject):
         # Get the location where the breakpoints converge
         convergence_point = event.center
 
+        # check if convergence point is in any of the obstacles, remove it and associated edges if it is
+        for obstacle in self.obstacle_polygons:
+            if( obstacle.inside(convergence_point) ):
+                # point is inside an obstacle, delete it
+
+                # remove edges that led to point inside obstacle
+                try:
+                    self.edges.remove(updated.edge)
+                except:
+                    self.edges.remove( updated.edge.twin )
+                try:
+                    self.edges.remove(removed.edge)
+                except:
+                    self.edges.remove( removed.edge.twin )
+
+                print("COLLISION ALERT")
+                # print(self.vertices)
+                # print(predecessor)
+                # print(successor)
+
+                return
+
         # Create a new edge for the new breakpoint, where the edge originates in the new breakpoint
         # Note: we only create the new edge if the vertex is still inside the bounding box
         # if self.bounding_poly.inside(event.center):
         # Create a vertex
+        print("all good yall")
         v = Vertex(convergence_point.xd, convergence_point.yd)
         self._vertices.add(v)
 

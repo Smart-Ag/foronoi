@@ -9,6 +9,8 @@ from foronoi.algorithm import Algorithm
 from foronoi.events import CircleEvent
 import matplotlib.pyplot as plt
 
+from geojson_importer import environment_reader # for plotting obstacles
+
 
 class Colors:
     SWEEP_LINE = "#2c3e50"
@@ -88,6 +90,10 @@ class Visualizer:
         fig, ax = plt.subplots(figsize=figsize)
         self.canvas = ax
 
+
+        # NOTE/TODO: path is relative to location of environment reader file
+        self.envDetails = environment_reader.envDetails('data/test_field.json')
+
     def _set_limits(self):
         self.canvas.set_ylim(self.min_y, self.max_y)
         self.canvas.set_xlim(self.min_x, self.max_x)
@@ -130,7 +136,7 @@ class Visualizer:
     def plot_all(self, polygon=False, edges=True, vertices=True, sites=True,
                  outgoing_edges=False, border_to_site=False, scale=1,
                  edge_labels=False, site_labels=False, triangles=False, arcs=False, sweep_line=False, events=False,
-                 arc_labels=False, beach_line=False):
+                 arc_labels=False, beach_line=False, obstacles=True):
         """
         Convenience method that calls other methods to display parts of the diagram.
 
@@ -178,6 +184,7 @@ class Visualizer:
         self: Visualizer
         """
 
+        self.plot_obstacles() if obstacles else False
         self.plot_sweep_line() if sweep_line else False
         self.plot_polygon() if polygon else False
         self.plot_edges(show_labels=edge_labels) if edges else False
@@ -351,7 +358,7 @@ class Visualizer:
         ----------
         edges: list(:class:`foronoi.graph.HalfEdge`), optional
             The edges to display. By default, the `voronoi`'s edges will be used.
-            
+
         sweep_line: Decimal
             The y-coordinate of the sweep line, used to calculate the positions of unfinished edges. By default, the
             `voronoi`'s sweep_line will be used.
@@ -372,7 +379,7 @@ class Visualizer:
         """
         Display each arc for each point. Only used if `beach_line` is also `True`.
         *Only useful during construction.*
-        
+
         Parameters
         ----------
         arcs: list(:ref:`Arc`)
@@ -423,6 +430,16 @@ class Visualizer:
 
         return self
 
+    def plot_obstacles(self):
+        for i,obstacle_poly in enumerate(self.envDetails.obstacles):
+            obs_x = []
+            obs_y = []
+            for point in obstacle_poly.points:
+                obs_x.append( point.x )
+                obs_y.append( point.y )
+
+            self.canvas.fill(obs_x, obs_y, color='red', zorder=0)
+
     def _plot_arc_labels(self, x, plot_lines, bottom, sweep_line, arcs):
         indices = np.nanargmin(plot_lines, axis=0)
         unique_indices = np.unique(indices)
@@ -437,7 +454,7 @@ class Visualizer:
     def plot_sweep_line(self, sweep_line=None):
         """
         Plot the sweep line.
-        
+
         Parameters
         ----------
         sweep_line: Decimal
