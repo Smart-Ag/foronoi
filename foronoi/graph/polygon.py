@@ -27,7 +27,8 @@ class Polygon(Subject):
         center = Coordinate((max_x + min_x) / 2, (max_y + min_y) / 2)
         self.min_y, self.min_x, self.max_y, self.max_x, self.center = min_y, min_x, max_y, max_x, center
 
-        self.points = self._order_points(self.points)
+        # TODO: remove this? messes up geojsons sometimes
+        # self.points = self._order_points(self.points)
         self.polygon_vertices = []
         for point in self.points:
             self.polygon_vertices.append(Vertex(point.xd, point.yd))

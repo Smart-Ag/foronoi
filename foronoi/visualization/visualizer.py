@@ -90,10 +90,6 @@ class Visualizer:
         fig, ax = plt.subplots(figsize=figsize)
         self.canvas = ax
 
-
-        # NOTE/TODO: path is relative to location of environment reader file
-        self.envDetails = environment_reader.envDetails('data/test_field.json')
-
     def _set_limits(self):
         self.canvas.set_ylim(self.min_y, self.max_y)
         self.canvas.set_xlim(self.min_x, self.max_x)
@@ -136,7 +132,7 @@ class Visualizer:
     def plot_all(self, polygon=False, edges=True, vertices=True, sites=True,
                  outgoing_edges=False, border_to_site=False, scale=1,
                  edge_labels=False, site_labels=False, triangles=False, arcs=False, sweep_line=False, events=False,
-                 arc_labels=False, beach_line=False, obstacles=True):
+                 arc_labels=False, beach_line=False, obstacles=None):
         """
         Convenience method that calls other methods to display parts of the diagram.
 
@@ -179,12 +175,14 @@ class Visualizer:
         beach_line: bool
             Display the beach line.
             *Only useful during construction.*
+        obstacles: list of Polygons of obstacles in field
+            can be excluded by not setting the obstacles optional argument
         Returns
         -------
         self: Visualizer
         """
 
-        self.plot_obstacles() if obstacles else False
+        self.plot_obstacles(obstacles) if obstacles is not None else False
         self.plot_sweep_line() if sweep_line else False
         self.plot_polygon() if polygon else False
         self.plot_edges(show_labels=edge_labels) if edges else False
@@ -430,8 +428,8 @@ class Visualizer:
 
         return self
 
-    def plot_obstacles(self):
-        for i,obstacle_poly in enumerate(self.envDetails.obstacles):
+    def plot_obstacles(self, obstacles):
+        for obstacle_poly in obstacles:
             obs_x = []
             obs_y = []
             for point in obstacle_poly.points:

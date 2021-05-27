@@ -217,7 +217,8 @@ class Algorithm(Subject):
             self.event = event
             self.notify_observers(Message.STEP_FINISHED)
 
-            print("")
+            print(index)
+
 
         self.notify_observers(Message.DEBUG, payload="# Sweep finished")
         self.notify_observers(Message.SWEEP_FINISHED)
@@ -275,7 +276,6 @@ class Algorithm(Subject):
             self.status_tree = LeafNode(new_arc)
             return
 
-        print(Tree.get_leaves(root=self.status_tree))
 
         # 2. Search the beach line tree for the arc above the point
         arc_node_above_point = Tree.find_leaf_node(self.status_tree, key=point_i.xd, sweep_line=self.sweep_line)
@@ -295,7 +295,6 @@ class Algorithm(Subject):
         #                  /       \
         #                p_i       p_j
         point_j = arc_above_point.origin
-        print("could be it", point_j)
         # this is where it all goes wrong, point_j should be P11 but it is P9
         breakpoint_left = Breakpoint(breakpoint=(point_j, point_i))
         breakpoint_right = Breakpoint(breakpoint=(point_i, point_j))
@@ -318,16 +317,12 @@ class Algorithm(Subject):
         AB = breakpoint_left
         BA = breakpoint_right
 
-        # print("hmmm", A.xy, B.xy) # not helpful
-
         # Edge AB -> BA with incident point B
         AB.edge = HalfEdge(B, origin=AB)
 
         # Edge BA -> AB with incident point A
         BA.edge = HalfEdge(A, origin=BA, twin=AB.edge)
 
-        print("waaa?", AB.edge.origin)
-        print(AB.edge.origin.breakpoint)
         # Append one of the edges to the list (we can get the other by using twin)
         self.edges.append(AB.edge)
 
@@ -419,33 +414,10 @@ class Algorithm(Subject):
         # Get the location where the breakpoints converge
         convergence_point = event.center
 
-        # check if convergence point is in any of the obstacles, remove it and associated edges if it is
-        for obstacle in self.obstacle_polygons:
-            if( obstacle.inside(convergence_point) ):
-                # point is inside an obstacle, delete it
-
-                # remove edges that led to point inside obstacle
-                try:
-                    self.edges.remove(updated.edge)
-                except:
-                    self.edges.remove( updated.edge.twin )
-                try:
-                    self.edges.remove(removed.edge)
-                except:
-                    self.edges.remove( removed.edge.twin )
-
-                print("COLLISION ALERT")
-                # print(self.vertices)
-                # print(predecessor)
-                # print(successor)
-
-                return
-
         # Create a new edge for the new breakpoint, where the edge originates in the new breakpoint
         # Note: we only create the new edge if the vertex is still inside the bounding box
         # if self.bounding_poly.inside(event.center):
         # Create a vertex
-        print("all good yall")
         v = Vertex(convergence_point.xd, convergence_point.yd)
         self._vertices.add(v)
 
@@ -485,6 +457,32 @@ class Algorithm(Subject):
         node_d, node_e, node_f = former_right.predecessor, former_right, former_right.successor
 
         self._check_circles((node_a, node_b, node_c), (node_d, node_e, node_f))
+
+        # check if convergence point is in any of the obstacles, remove it and associated edges if it is
+        for obstacle in self.obstacle_polygons:
+            if (obstacle.inside(convergence_point)):
+
+                # point is inside an obstacle, delete it
+                self._vertices.remove(v)
+
+                # remove new edge spawning on removed point
+                self.edges.remove(new_edge)
+
+                # remove existing edges that connect to vertex being removed
+                self._remove_vertex_edges(event)
+
+    def _remove_vertex_edges(self, event):
+        # 3 points in circle event (any related edge will split one of the pairs)
+        points = event.arc_triple
+
+        # check all potential edges to removed vertex, remove them if they exist
+        for (idx1, idx2) in [(0,1), (0,2), (1,2)]: # TODO: better way to do this?
+            for edge in self.edges:
+                # check point pair and the reverse (i.e. P1/P2 and P2/P1)
+                if (points[idx1].origin, points[idx2].origin) == (edge.incident_point, edge.twin.incident_point) or (points[idx2].origin, points[idx1].origin) == (edge.incident_point, edge.twin.incident_point):
+                    self.edges.remove(edge)
+
+
 
     def _check_circles(self, triple_left, triple_right):
         node_a, node_b, node_c = triple_left

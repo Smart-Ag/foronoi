@@ -9,7 +9,7 @@ from foronoi.visualization.visualizer import Visualizer, Presets
 
 
 class VoronoiObserver(Observer, ABC):
-    def __init__(self, visualize_steps=True, visualize_before_clipping=False, visualize_result=True, callback=None,
+    def __init__(self, obstacles, visualize_steps=True, visualize_before_clipping=False, visualize_result=True, callback=None,
                  figsize=(8, 8), canvas_offset=1, settings=None):
         """
         Observers the state of the algorithm (:class:`foronoi.algorithm.Algorithm`) and visualizes
@@ -17,6 +17,9 @@ class VoronoiObserver(Observer, ABC):
 
         Parameters
         ----------
+        field_data: object that stores field boundary and obstacles as Polygons (see foronoi.graph.Polygon)
+            field_data.boundary -> Polygon representing boundary of operating area
+            field_data.obstacles -> List of Polygons representing the obstacles in the operating area
         visualize_steps: bool
             Visualize all individual steps
         visualize_before_clipping: bool
@@ -65,6 +68,8 @@ class VoronoiObserver(Observer, ABC):
         self.n_messages = 0
         self.messages = []
         self.settings = settings or {}
+        # for plotting
+        self.obstacles = obstacles
 
     def update(self, subject: Algorithm, message: Message, **kwargs):
         """
@@ -85,24 +90,27 @@ class VoronoiObserver(Observer, ABC):
             settings = Presets.construction
             settings.update(self.settings)
             assert subject.sweep_line == subject.event.yd
-            result = vis.plot_all(**settings)
+            result = vis.plot_all(**settings, obstacles=self.obstacles)
             plt.title(str(subject.event) + "\n")
         elif message == Message.SWEEP_FINISHED and self.visualize_before_clipping:
             vis = Visualizer(subject, canvas_offset=self.canvas_offset)
             settings = Presets.clipping
             settings.update(self.settings)
-            result = vis.plot_all(**settings)
+            result = vis.plot_all(**settings, obstacles=self.obstacles)
             plt.title("Sweep finished\n")
+
         elif message == Message.VORONOI_FINISHED and self.visualize_result:
             vis = Visualizer(subject, canvas_offset=self.canvas_offset)
+            # settings = Presets.final
+            # settings.update(self.settings)
             settings = Presets.final
-            settings.update(self.settings)
-            result = vis.plot_all(**settings)
+            result = vis.plot_all(**settings, obstacles=self.obstacles)
             plt.title("Voronoi completed\n")
 
+            self.callback(self, result.get_canvas()) #saves image to file
         else:
             return
 
-        self.callback(self, result.get_canvas())
+        # self.callback(self, result.get_canvas())
         self.n_messages += 1
         self.messages.append(message)
