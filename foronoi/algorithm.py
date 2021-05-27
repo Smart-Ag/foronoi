@@ -122,7 +122,7 @@ class Algorithm(Subject):
 
         return self.event_queue
 
-    def create_diagram(self, obstacle_polys: list, boundary: Polygon):
+    def create_diagram(self, obstacle_polys: list):
         """
         Create the Voronoi diagram.
 
@@ -154,7 +154,7 @@ class Algorithm(Subject):
 
         # generate list of points to avoid from polygons defining obstacles and boundary polygon
         points = []
-        for coord in boundary.points:
+        for coord in self.bounding_poly.points:
             points.append( Point(coord.x, coord.y) )
         for obstacle in obstacle_polys:
             for coord in obstacle.points:
@@ -470,6 +470,7 @@ class Algorithm(Subject):
 
                 # remove existing edges that connect to vertex being removed
                 self._remove_vertex_edges(event)
+
 
     def _remove_vertex_edges(self, event):
         # 3 points in circle event (any related edge will split one of the pairs)
