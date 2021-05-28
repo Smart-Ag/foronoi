@@ -9,8 +9,6 @@ from foronoi.algorithm import Algorithm
 from foronoi.events import CircleEvent
 import matplotlib.pyplot as plt
 
-from geojson_importer import environment_reader # for plotting obstacles
-
 
 class Colors:
     SWEEP_LINE = "#2c3e50"

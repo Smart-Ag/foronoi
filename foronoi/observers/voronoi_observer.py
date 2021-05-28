@@ -94,23 +94,30 @@ class VoronoiObserver(Observer, ABC):
             plt.title(str(subject.event) + "\n")
         elif message == Message.SWEEP_FINISHED and self.visualize_before_clipping:
             vis = Visualizer(subject, canvas_offset=self.canvas_offset)
-            settings = Presets.clipping
+            settings = Presets.final
             settings.update(self.settings)
             result = vis.plot_all(**settings, obstacles=self.obstacles)
             plt.title("Sweep finished\n")
 
+            self.callback(self, result.get_canvas())  # saves image to file (no it doesn't lol)
+            # plt.pause(5)
+            # plt.close()
+
         elif message == Message.VORONOI_FINISHED and self.visualize_result:
             vis = Visualizer(subject, canvas_offset=self.canvas_offset)
-            # settings = Presets.final
-            # settings.update(self.settings)
             settings = Presets.final
+            settings.update(self.settings)
             result = vis.plot_all(**settings, obstacles=self.obstacles)
             plt.title("Voronoi completed\n")
 
-            self.callback(self, result.get_canvas()) #saves image to file
+            self.callback(self, result.get_canvas()) #saves image to file (no it doesn't lol)
+            # plt.pause(5)
+            # plt.close()
         else:
             return
 
         # self.callback(self, result.get_canvas())
+        # plt.pause(0.5)
+        # plt.close()
         self.n_messages += 1
         self.messages.append(message)

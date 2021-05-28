@@ -69,7 +69,9 @@ class Polygon(Subject):
         vertices: list(Vertex)
             The list of all vertices including the
         """
+
         vertices = self._get_ordered_vertices(self.polygon_vertices)
+        # vertices = [vertex for vertex in self.polygon_vertices if vertex.xd is not None]
         vertices = list(vertices) + [vertices[0]]  # <- The extra vertex added here, should be removed later
         cell = self._get_closest_point(vertices[0], points)
         previous_edge = None
@@ -179,8 +181,11 @@ class Polygon(Subject):
 
             cross = dxc * dy1 - dyc * dx1
 
-            if cross == 0:
+            # print(cross)
+            # if cross == 0:
+            if abs(cross) < 1: # catches points super close to edge (also bad)
                 return True
+
         return False
 
     def inside(self, point):
