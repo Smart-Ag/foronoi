@@ -16,8 +16,7 @@ setup(
         'foronoi.tree',
         'foronoi.nodes',
         "foronoi.graph",
-        "foronoi.events",
-        "foronoi.tests"
+        "foronoi.events"
     ],
     version="1.0.3",
     description="Fortune's algorithm for fast Voronoi diagram construction with extras.",
