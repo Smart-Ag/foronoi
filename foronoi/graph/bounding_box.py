@@ -1,4 +1,4 @@
-from foronoi.graph import Polygon, Coordinate
+from foronoi.graph import Polygon
 
 
 class BoundingBox(Polygon):

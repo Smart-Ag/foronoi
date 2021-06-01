@@ -1,14 +1,13 @@
-from decimal import Decimal
-
 from foronoi.graph.coordinate import Coordinate
 
 
 class Arc:
     def __init__(self, origin: Coordinate, circle_event=None):
         """
-        Each leaf of beach line, representing an arc `α`, stores one pointer to a node in the event queue, namely, the
-        node that represents the circle event in which `α` will disappear. This pointer is None if no circle event
-        exists where `α` will disappear, or this circle event has not been detected yet.
+        Each leaf of beach line, representing an arc `α`, stores one pointer to a node in the
+        event queue, namely, the node that represents the circle event in which `α` will
+        disappear. This pointer is None if no circle event exists where `α` will disappear,
+        or this circle event has not been detected yet.
 
         Parameters
         ----------

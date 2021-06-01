@@ -1,5 +1,4 @@
-import math
-from decimal import *
+from decimal import Decimal
 
 from foronoi.events.event import Event
 from foronoi.graph.coordinate import Coordinate
@@ -10,7 +9,8 @@ from foronoi.nodes.arc import Arc
 class CircleEvent(Event):
     circle_event = True
 
-    def __init__(self, center: Coordinate, radius: Decimal, arc_node: LeafNode, point_triple=None, arc_triple=None):
+    def __init__(self, center: Coordinate, radius: Decimal, arc_node: LeafNode,
+                 point_triple=None, arc_triple=None):
         """
         A circle event.
 
@@ -35,12 +35,14 @@ class CircleEvent(Event):
         self.arc_triple = arc_triple
 
     def __repr__(self):
-        return f"CircleEvent({self.point_triple}, y-radius={self.center.yd - self.radius:.2f}, y={self.center.yd:.2f}, radius={self.radius:.2f})"
+        return f"CircleEvent({self.point_triple}, y-radius={self.center.yd - self.radius:.2f}," \
+               f" y={self.center.yd:.2f}, radius={self.radius:.2f})"
 
     @property
     def xd(self):
         """
-        The x-coordinate (in Decimal format) of the center of the circle, which functions as the secondary priority of this event.
+        The x-coordinate (in Decimal format) of the center of the circle, which functions
+        as the secondary priority of this event.
 
         Returns
         -------
@@ -51,7 +53,8 @@ class CircleEvent(Event):
     @property
     def yd(self):
         """
-        The y-coordinate (in Decimal format) of the bottom of the circle, which functions as the primary priority of this event.
+        The y-coordinate (in Decimal format) of the bottom of the circle, which functions
+        as the primary priority of this event.
 
         Returns
         -------
@@ -78,7 +81,8 @@ class CircleEvent(Event):
         return self
 
     @staticmethod
-    def create_circle_event(left_node: LeafNode, middle_node: LeafNode, right_node: LeafNode, sweep_line) -> "CircleEvent":
+    def create_circle_event(left_node: LeafNode, middle_node: LeafNode, right_node: LeafNode,
+                            sweep_line) -> "CircleEvent":
         """
         Checks if the breakpoints converge, and inserts circle event if required.
 
@@ -117,7 +121,8 @@ class CircleEvent(Event):
             x, y, radius = CircleEvent.create_circle(a, b, c)
 
             # Return circle event
-            return CircleEvent(center=Coordinate(x, y), radius=radius, arc_node=middle_node, point_triple=(a, b, c),
+            return CircleEvent(center=Coordinate(x, y), radius=radius, arc_node=middle_node,
+                               point_triple=(a, b, c),
                                arc_triple=(left_arc, middle_arc, right_arc))
 
         return None

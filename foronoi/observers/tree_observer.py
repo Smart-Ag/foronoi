@@ -8,10 +8,11 @@ from graphviz import Digraph
 
 
 class TreeObserver(Observer, ABC):
-    def __init__(self, visualize_steps=True, visualize_result=True, text_based=False, callback=None):
+    def __init__(self, visualize_steps=True, visualize_result=True, text_based=False,
+                 callback=None):
         """
-        Observers the state of the status tree (:attr:`foronoi.algorithm.Algorithm.status_tree`) and visualizes
-        the result using GraphViz.
+        Observers the state of the status tree (:attr:`foronoi.algorithm.Algorithm.status_tree`)
+        and visualizes the result using GraphViz.
 
         Parameters
         ----------
@@ -22,9 +23,9 @@ class TreeObserver(Observer, ABC):
         text_based: bool
             Visualize the tree using plain text instead of GraphViz
         callback: function
-            By default, the TreeObserver renders and shows the result in a window, or prints the result when
-            `text_based` is true. When a callback function is given, either the GraphViz diagram or the text-string
-            is passed to the callback.
+            By default, the TreeObserver renders and shows the result in a window, or prints the
+            result when `text_based` is true. When a callback function is given, either the
+            GraphViz diagram or the text-string is passed to the callback.
 
         Examples
         --------
@@ -67,7 +68,8 @@ class TreeObserver(Observer, ABC):
             The message type
         """
         if (message == Message.STEP_FINISHED and self.visualize_steps) or \
-           (message == Message.VORONOI_FINISHED and self.visualize_result and not self.visualize_steps):
+           (message == Message.VORONOI_FINISHED and self.visualize_result and not
+           self.visualize_steps):
             if self.text_based:
                 visualized_in_text = subject.status_tree.visualize()
                 if self.callback is not None:

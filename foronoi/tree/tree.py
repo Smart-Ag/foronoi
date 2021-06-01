@@ -1,4 +1,3 @@
-from foronoi.nodes import Arc, Breakpoint
 from foronoi.tree.node import Node
 
 
@@ -29,8 +28,8 @@ class Tree:
 
         :param root: (Node) The root to start searching from
         :param query: The query
-        :param compare: (lambda) Lambda expression to compare the node against the query. Will be called as
-        compare(node.data, query.data).
+        :param compare: (lambda) Lambda expression to compare the node against the query.
+          Will be called as compare(node.data, query.data).
         :param kwargs: Optional arguments to be passed to the get_key() functions
         :return: (Node or None) Returns the node that corresponds to the query or None
         """

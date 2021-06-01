@@ -21,8 +21,8 @@ from foronoi.tree.tree import Tree
 class Algorithm(Subject):
     def __init__(self, bounding_poly: Polygon = None, remove_zero_length_edges=True):
         """
-        A Python implementation of Fortune's algorithm based on the description of "Computational Geometry:
-        Algorithms and Applications" by de Berg et al.
+        A Python implementation of Fortune's algorithm based on the description of
+        "Computational Geometry: Algorithms and Applications" by de Berg et al.
 
         Parameters
         ----------
@@ -38,9 +38,10 @@ class Algorithm(Subject):
         event_queue: PriorityQueue
             Event queue for upcoming site and circle events
         status_tree: Node
-            The status structure is a data structure that stores the relevant situation at the current position of
-            the sweep line. This attribute points to the root of the balanced binary search tree that functions as a
-            status structure which represents the beach line as a balanced binary search tree.
+            The status structure is a data structure that stores the relevant situation at
+             the current position of the sweep line. This attribute points to the root of
+             the balanced binary search tree that functions as a status structure which
+              represents the beach line as a balanced binary search tree.
         sweep_line: Decimal
             The y-coordinate
         arcs: list(:class:`foronoi.nodes.Arc`)
@@ -128,18 +129,19 @@ class Algorithm(Subject):
 
         The overall structure of the algorithm is as follows.
 
-        1. Initialize the event queue `event_queue` with all site events, initialize an empty status structure
-           `status_tree` and an empty doubly-connected edge list `D`.
+        1. Initialize the event queue `event_queue` with all site events, initialize an
+         empty status structure  `status_tree` and an empty doubly-connected edge list `D`.
         2. **while** `event_queue` is not empty.
         3.  **do** Remove the event with largest `y`-coordinate from `event_queue`.
         4.   **if** the event is a site event, occurring at site `point`
         5.    **then** :func:`~handle_site_event`
         6.    **else** :func:`handle_circle_event`
-        7. The internal nodes still present in `status_tree` correspond to the half-infinite edges of the Voronoi
-           diagram. Compute a bounding box (or polygon) that contains all vertices of  bounding box by updating the
-           doubly-connected edge list appropriately.
+        7. The internal nodes still present in `status_tree` correspond to the half-infinite
+         edges of the Voronoi diagram. Compute a bounding box (or polygon) that contains all
+          vertices of  bounding box by updating the doubly-connected edge list appropriately.
         8. **If** `remove_zero_length_edges` is true.
-        9.  Call :func:`~clean_up_zero_length_edges` which removes zero length edges and combines vertices with the same location into one.
+        9.  Call :func:`~clean_up_zero_length_edges` which removes zero length edges and
+           combines vertices with the same location into one.
 
         Parameters
         ----------
@@ -148,17 +150,17 @@ class Algorithm(Subject):
 
         Returns
         -------
-        Output. The Voronoi diagram `Vor(P)` given inside a bounding box in a doublyconnected edge list `D`.
+        Output. The Voronoi diagram `Vor(P)` given inside a bounding box in a doubly
+        connected edge list `D`.
         """
-
 
         # generate list of points to avoid from polygons defining obstacles and boundary polygon
         points = []
         for coord in self.bounding_poly.points:
-            points.append( Point(coord.x, coord.y) )
+            points.append(Point(coord.x, coord.y))
         for obstacle in obstacle_polys:
             for coord in obstacle.points:
-                points.append( Point(coord.x, coord.y) )
+                points.append(Point(coord.x, coord.y))
 
         # store for collision detection (of graph nodes & edges) later on
         self.obstacle_polygons = obstacle_polys
@@ -186,7 +188,8 @@ class Algorithm(Subject):
                 # Debugging
                 self.notify_observers(
                     Message.DEBUG,
-                    payload=f"# Handle circle event at {event.yd:.3f} with center= {event.center} and arcs= {event.point_triple}"
+                    payload=f"# Handle circle event at {event.yd:.3f} with "
+                            f"center= {event.center} and arcs= {event.point_triple}"
                 )
 
                 # Handle the event
@@ -219,16 +222,17 @@ class Algorithm(Subject):
 
             print(index)
 
-
         self.notify_observers(Message.DEBUG, payload="# Sweep finished")
         self.notify_observers(Message.SWEEP_FINISHED)
 
         # Finish with the bounding box
         self.edges = self.bounding_poly.finish_edges(
-            edges=self.edges, vertices=self._vertices, points=self.sites, event_queue=self.event_queue
-        )
+            edges=self.edges, vertices=self._vertices, points=self.sites,
+            event_queue=self.event_queue)
 
-        self.edges, self._vertices = self.bounding_poly.finish_polygon(self.edges, self._vertices, self.sites)
+        self.edges, self._vertices = self.bounding_poly.finish_polygon(self.edges,
+                                                                       self._vertices,
+                                                                       self.sites)
 
         if self.remove_zero_length_edges:
             self.clean_up_zero_length_edges()
@@ -241,24 +245,28 @@ class Algorithm(Subject):
         """
         Handle a site event.
 
-        1. Let :obj:`point_i = event.point`. If :attr:`status_tree` is empty, insert :obj:`point_i` into it (so that
-           :attr:`status_tree` consists of a single leaf storing :obj:`point_i`) and return. Otherwise, continue with
-           steps 2– 5.
-        2. Search in :attr:`status_tree` for the arc :obj:`α` vertically above :obj:`point_i`. If the leaf
-           representing :obj:`α` has a pointer to a circle event in :attr:`event_queue`, then this circle event is a
-           false alarm and it must be deleted from :attr:`status_tree`.
-        3. Replace the leaf of :attr:`status_tree` that represents :obj:`α` with a subtree having three leaves.
-           The middle leaf stores the new site :obj:`point_i` and the other two leaves store the site
-           :obj:`point_j` that was originally stored with :obj:`α`. Store the breakpoints
-           (:obj:`point_j`, :obj:`point_i`) and (:obj:`point_i`, :obj:`point_j`) representing the new breakpoints at the
-           two new internal nodes. Perform rebalancing operations on :attr:`status_tree` if necessary.
+        1. Let :obj:`point_i = event.point`. If :attr:`status_tree` is empty, insert
+           :obj:`point_i` into it (so that :attr:`status_tree` consists of a single
+           leaf storing :obj:`point_i`) and return. Otherwise, continue with steps 2– 5.
+        2. Search in :attr:`status_tree` for the arc :obj:`α` vertically above :obj:
+           `point_i`. If the leaf representing :obj:`α` has a pointer to a circle event
+            in :attr:`event_queue`, then this circle event is a false alarm and it must
+             be deleted from :attr:`status_tree`.
+        3. Replace the leaf of :attr:`status_tree` that represents :obj:`α` with a
+           subtree having three leaves. The middle leaf stores the new site :obj:
+           `point_i` and the other two leaves store the site :obj:`point_j` that was
+            originally stored with :obj:`α`. Store the breakpoints (:obj:`point_j`,
+            :obj:`point_i`) and (:obj:`point_i`, :obj:`point_j`) representing the new
+            breakpoints at the two new internal nodes. Perform rebalancing operations
+            on :attr:`status_tree` if necessary.
         4. Create new half-edge records in the Voronoi diagram structure for the
-           edge separating the faces for :obj:`point_i` and :obj:`point_j`, which will be traced out by the two new
-           breakpoints.
+           edge separating the faces for :obj:`point_i` and :obj:`point_j`, which
+           will be traced out by the two new breakpoints.
         5. Check the triple of consecutive arcs where the new arc for pi is the left arc
-           to see if the breakpoints converge. If so, insert the circle event into :attr:`status_tree` and
-           add pointers between the node in :attr:`status_tree` and the node in :attr:`event_queue`. Do the same for the
-           triple where the new arc is the right arc.
+           to see if the breakpoints converge. If so, insert the circle event into :attr:
+           `status_tree` and add pointers between the node in :attr:`status_tree` and the
+           node in :attr:`event_queue`. Do the same for the triple where the new arc is
+           the right arc.
 
         Parameters
         ----------
@@ -276,16 +284,17 @@ class Algorithm(Subject):
             self.status_tree = LeafNode(new_arc)
             return
 
-
         # 2. Search the beach line tree for the arc above the point
-        arc_node_above_point = Tree.find_leaf_node(self.status_tree, key=point_i.xd, sweep_line=self.sweep_line)
+        arc_node_above_point = Tree.find_leaf_node(self.status_tree, key=point_i.xd,
+                                                   sweep_line=self.sweep_line)
         arc_above_point = arc_node_above_point.get_value()
 
         # Remove potential false alarm
         if arc_above_point.circle_event is not None:
             arc_above_point.circle_event.remove()
 
-        # 3. Replace leaf with new sub tree that represents the two new intersections on the arc above the point
+        # 3. Replace leaf with new sub tree that represents the two new intersections
+        #    on the arc above the point
         #
         #            (p_j, p_i)
         #              /     \
@@ -310,7 +319,8 @@ class Algorithm(Subject):
         else:
             root.right = LeafNode(new_arc)
 
-        self.status_tree = arc_node_above_point.replace_leaf(replacement=root, root=self.status_tree)
+        self.status_tree = arc_node_above_point.replace_leaf(replacement=root,
+                                                             root=self.status_tree)
 
         # 4. Create half edge records
         A, B = point_j, point_i
@@ -330,7 +340,8 @@ class Algorithm(Subject):
         B.first_edge = B.first_edge or AB.edge
         A.first_edge = A.first_edge or BA.edge
 
-        # 5. Check if breakpoints are going to converge with the arcs to the left and to the right
+        # 5. Check if breakpoints are going to converge with the arcs to the
+        #    left and to the right
         #
         #            (p_j, p_i)
         #  \           /     \
@@ -357,22 +368,25 @@ class Algorithm(Subject):
         """
         Handle a circle event.
 
-        1. Delete the leaf :obj:`γ` that represents the disappearing arc :obj:`α` from :attr:`status_tree`. Update
-           the tuples representing the breakpoints at the internal nodes. Perform
-           rebalancing operations on :attr:`status_tree` if necessary. Delete all circle events involving
-           :obj:`α` from :attr:`event_queue`; these can be found using the pointers from the predecessor and
-           the successor of :obj:`γ` in :attr:`status_tree`. (The circle event where :obj:`α` is the middle arc is
-           currently being handled, and has already been deleted from :attr:`event_queue`.)
+        1. Delete the leaf :obj:`γ` that represents the disappearing arc :obj:`α` from
+           :attr:`status_tree`. Update the tuples representing the breakpoints at the
+           internal nodes. Perform rebalancing operations on :attr:`status_tree` if
+           necessary. Delete all circle events involving :obj:`α` from :attr:`event_queue`;
+           these can be found using the pointers from the predecessor and the successor of
+           :obj:`γ` in :attr:`status_tree`. (The circle event where :obj:`α` is the middle
+           arc is currently being handled, and has already been deleted from
+           :attr:`event_queue`.)
         2. Add the center of the circle causing the event as a vertex record to the
-           doubly-connected edge list :obj:`D` storing the Voronoi diagram under construction. Create two half-edge
-           records corresponding to the new breakpoint
+           doubly-connected edge list :obj:`D` storing the Voronoi diagram under construction.
+           Create two half-edge records corresponding to the new breakpoint
            of the beach line. Set the pointers between them appropriately. Attach the
            three new records to the half-edge records that end at the vertex.
         3. Check the new triple of consecutive arcs that has the former left neighbor
            of :obj:`α` as its middle arc to see if the two breakpoints of the triple converge.
-           If so, insert the corresponding circle event into :attr:`event_queue`. and set pointers between
-           the new circle event in :attr:`event_queue` and the corresponding leaf of :attr:`status_tree`. Do the same
-           for the triple where the former right neighbor is the middle arc.
+           If so, insert the corresponding circle event into :attr:`event_queue`. and set
+           pointers between the new circle event in :attr:`event_queue` and the corresponding
+           leaf of :attr:`status_tree`. Do the same for the triple where the former right
+           neighbor is the middle arc.
 
         Parameters
         ----------
@@ -403,7 +417,8 @@ class Algorithm(Subject):
         def remove(neighbor_event):
             if neighbor_event is None:
                 return None
-            self.notify_observers(Message.DEBUG, payload=f"Circle event for {neighbor_event.yd} removed.")
+            self.notify_observers(Message.DEBUG, payload=f"Circle event for "
+                                                         f"{neighbor_event.yd} removed.")
             return neighbor_event.remove()
 
         remove(predecessor.get_value().circle_event)
@@ -449,7 +464,8 @@ class Algorithm(Subject):
         # Let the updated breakpoint point back to the new edge
         updated.edge = new_edge.twin
 
-        # 3. Check if breakpoints converge for the triples with former left and former right as middle arcs
+        # 3. Check if breakpoints converge for the triples with former left
+        #    and former right as middle arcs
         former_left = predecessor
         former_right = successor
 
@@ -458,7 +474,8 @@ class Algorithm(Subject):
 
         self._check_circles((node_a, node_b, node_c), (node_d, node_e, node_f))
 
-        # check if convergence point is in any of the obstacles, remove it and associated edges if it is
+        # check if convergence point is in any of the obstacles, remove it and associated
+        # edges if it is
         for obstacle in self.obstacle_polygons:
             if (obstacle.inside(convergence_point)):
 
@@ -471,38 +488,44 @@ class Algorithm(Subject):
                 # remove existing edges that connect to vertex being removed
                 self._remove_vertex_edges(event)
 
-
     def _remove_vertex_edges(self, event):
         # 3 points in circle event (any related edge will split one of the pairs)
         points = event.arc_triple
 
         # check all potential edges to removed vertex, remove them if they exist
-        for (idx1, idx2) in [(0,1), (0,2), (1,2)]: # TODO: better way to do this?
+        for (idx1, idx2) in [(0, 1), (0, 2), (1, 2)]:  # TODO: better way to do this?
             for edge in self.edges:
                 # check point pair and the reverse (i.e. P1/P2 and P2/P1)
-                if (points[idx1].origin, points[idx2].origin) == (edge.incident_point, edge.twin.incident_point) or (points[idx2].origin, points[idx1].origin) == (edge.incident_point, edge.twin.incident_point):
+                if (points[idx1].origin, points[idx2].origin) == (edge.incident_point,
+                                                                  edge.twin.incident_point) \
+                        or (points[idx2].origin, points[idx1].origin) == \
+                        (edge.incident_point, edge.twin.incident_point):
                     self.edges.remove(edge)
-
-
 
     def _check_circles(self, triple_left, triple_right):
         node_a, node_b, node_c = triple_left
         node_d, node_e, node_f = triple_right
 
-        left_event = CircleEvent.create_circle_event(node_a, node_b, node_c, sweep_line=self.sweep_line)
-        right_event = CircleEvent.create_circle_event(node_d, node_e, node_f, sweep_line=self.sweep_line)
+        left_event = CircleEvent.create_circle_event(node_a, node_b, node_c,
+                                                     sweep_line=self.sweep_line)
+        right_event = CircleEvent.create_circle_event(node_d, node_e, node_f,
+                                                      sweep_line=self.sweep_line)
 
         # Check if the circles converge
         if left_event:
-            if not Algebra.check_clockwise(node_a.data.origin, node_b.data.origin, node_c.data.origin,
-                                           left_event.center):
-                self.notify_observers(Message.DEBUG, payload=f"Circle {left_event.point_triple} not clockwise.")
+            if not Algebra.check_clockwise(node_a.data.origin, node_b.data.origin,
+                                           node_c.data.origin, left_event.center):
+                self.notify_observers(Message.DEBUG, payload=f"Circle "
+                                                             f"{left_event.point_triple} "
+                                                             f"not clockwise.")
                 left_event = None
 
         if right_event:
-            if not Algebra.check_clockwise(node_d.data.origin, node_e.data.origin, node_f.data.origin,
-                                           right_event.center):
-                self.notify_observers(Message.DEBUG, payload=f"Circle {right_event.point_triple} not clockwise.")
+            if not Algebra.check_clockwise(node_d.data.origin, node_e.data.origin,
+                                           node_f.data.origin, right_event.center):
+                self.notify_observers(Message.DEBUG, payload=f"Circle "
+                                                             f"{right_event.point_triple} "
+                                                             f"not clockwise.")
                 right_event = None
 
         if left_event is not None:
@@ -515,10 +538,14 @@ class Algorithm(Subject):
 
         if left_event is not None:
             self.notify_observers(Message.DEBUG,
-                                  payload=f"Left circle event created for {left_event.yd}. Arcs: {left_event.point_triple}")
+                                  payload=f"Left circle event created for "
+                                          f"{left_event.yd}. Arcs: "
+                                          f"{left_event.point_triple}")
         if right_event is not None:
             self.notify_observers(Message.DEBUG,
-                                  payload=f"Right circle event created for {right_event.yd}. Arcs: {right_event.point_triple}")
+                                  payload=f"Right circle event created for "
+                                          f"{right_event.yd}. Arcs: "
+                                          f"{right_event.point_triple}")
 
         return left_event, right_event
 
@@ -539,15 +566,18 @@ class Algorithm(Subject):
             root = Tree.balance_and_propagate(root)
 
             # Find the left breakpoint
-            left_breakpoint = Breakpoint(breakpoint=(predecessor.get_value().origin, arc_node.get_value().origin))
+            left_breakpoint = Breakpoint(breakpoint=(predecessor.get_value().origin,
+                                                     arc_node.get_value().origin))
             query = InternalNode(left_breakpoint)
             compare = lambda x, y: hasattr(x, "breakpoint") and x.breakpoint == y.breakpoint
-            breakpoint: InternalNode = Tree.find_value(root, query, compare, sweep_line=sweep_line)
+            breakpoint: InternalNode = Tree.find_value(root, query, compare,
+                                                       sweep_line=sweep_line)
 
             # Update the breakpoint
             # assert(breakpoint is not None)
             if breakpoint is not None:
-                breakpoint.data.breakpoint = (breakpoint.get_value().breakpoint[0], successor.get_value().origin)
+                breakpoint.data.breakpoint = (breakpoint.get_value().breakpoint[0],
+                                              successor.get_value().origin)
 
             # Mark this breakpoint as updated and left breakpoint
             updated = breakpoint.data if breakpoint is not None else None
@@ -567,15 +597,18 @@ class Algorithm(Subject):
             root = Tree.balance_and_propagate(root)
 
             # Find the right breakpoint
-            right_breakpoint = Breakpoint(breakpoint=(arc_node.get_value().origin, successor.get_value().origin))
+            right_breakpoint = Breakpoint(breakpoint=(arc_node.get_value().origin,
+                                                      successor.get_value().origin))
             query = InternalNode(right_breakpoint)
             compare = lambda x, y: hasattr(x, "breakpoint") and x.breakpoint == y.breakpoint
-            breakpoint: InternalNode = Tree.find_value(root, query, compare, sweep_line=sweep_line)
+            breakpoint: InternalNode = Tree.find_value(root, query, compare,
+                                                       sweep_line=sweep_line)
 
             # Update the breakpoint
             # assert(breakpoint is not None)
             if breakpoint is not None:
-                breakpoint.data.breakpoint = (predecessor.get_value().origin, breakpoint.get_value().breakpoint[1])
+                breakpoint.data.breakpoint = (predecessor.get_value().origin,
+                                              breakpoint.get_value().breakpoint[1])
 
             # Mark this breakpoint as updated and right breakpoint
             updated = breakpoint.data if breakpoint is not None else None

@@ -1,11 +1,9 @@
-from copy import copy
 from decimal import Decimal
 
 import numpy as np
 from matplotlib import patches
 
 from foronoi import Coordinate
-from foronoi.algorithm import Algorithm
 from foronoi.events import CircleEvent
 import matplotlib.pyplot as plt
 
@@ -83,7 +81,8 @@ class Visualizer:
             Width, height in inches
         """
         self.voronoi = voronoi
-        self.min_x, self.max_x, self.min_y, self.max_y = self._canvas_size(voronoi.bounding_poly, canvas_offset)
+        self.min_x, self.max_x, self.min_y, self.max_y = self._canvas_size(voronoi.bounding_poly,
+                                                                           canvas_offset)
         plt.close("all")  # Prevents previous created plots from showing up
         fig, ax = plt.subplots(figsize=figsize)
         self.canvas = ax
@@ -129,8 +128,9 @@ class Visualizer:
 
     def plot_all(self, polygon=False, edges=True, vertices=True, sites=True,
                  outgoing_edges=False, border_to_site=False, scale=1,
-                 edge_labels=False, site_labels=False, triangles=False, arcs=False, sweep_line=False, events=False,
-                 arc_labels=False, beach_line=False, obstacles=None):
+                 edge_labels=False, site_labels=False, triangles=False, arcs=False,
+                 sweep_line=False, events=False, arc_labels=False, beach_line=False,
+                 obstacles=None):
         """
         Convenience method that calls other methods to display parts of the diagram.
 
@@ -148,13 +148,16 @@ class Visualizer:
         outgoing_edges: bool
             Show arrows of length `scale` in the direction of the outgoing edges for each vertex.
         border_to_site: bool
-            Indicate with dashed line to which site a border belongs. The site's first edge is colored green.
+            Indicate with dashed line to which site a border belongs. The site's first edge
+              is colored green.
         scale: float
             Used to set the length of the `outgoing_edges`.
         edge_labels: bool
-            Display edge labels of format "`A/B`", where the edge is `A`'s border and the edge's twin is `B`'s border.
+            Display edge labels of format "`A/B`", where the edge is `A`'s border and the
+              edge's twin is `B`'s border.
         site_labels: bool
-            Display the labels of the cell points, of format "`P#`", where `#` is the `n`th point from top to bottom.
+            Display the labels of the cell points, of format "`P#`", where `#` is the `n`th
+              point from top to bottom.
         triangles: bool
             Display the triangle of the 3 points responsible for causing a circle event.
             *Only useful during construction.*
@@ -213,7 +216,8 @@ class Visualizer:
         else:
             # Draw bounding box
             self.canvas.add_patch(
-                patches.Polygon(self.voronoi.bounding_poly.get_coordinates(), fill=False, edgecolor=Colors.BOUNDING_BOX)
+                patches.Polygon(self.voronoi.bounding_poly.get_coordinates(), fill=False,
+                                edgecolor=Colors.BOUNDING_BOX)
             )
 
         return self
@@ -248,7 +252,8 @@ class Visualizer:
         Parameters
         ----------
         vertices: list(:class:`foronoi.graph.Vertex`), optional
-            The vertices for which to display the outgoing edges. By default, the `voronoi`'s vertices will be used.
+            The vertices for which to display the outgoing edges. By default, the
+              `voronoi`'s vertices will be used.
         scale: float
             Used to set the length of the `outgoing_edges`.
         kwargs
@@ -276,11 +281,12 @@ class Visualizer:
                     continue
 
                 direction = (x_diff / length, y_diff / length)
-                new_end = Coordinate(start.xd + direction[0] * scale, start.yd + direction[1] * scale)
+                new_end = Coordinate(start.xd + direction[0] * scale, start.yd +
+                                     direction[1] * scale)
 
                 props = dict(arrowstyle="->", color=Colors.EDGE_DIRECTION, linewidth=3, **kwargs)
-                self.canvas.annotate(text='', xy=(new_end.xd, new_end.yd), xytext=(start.xd, start.yd),
-                                     arrowprops=props)
+                self.canvas.annotate(text='', xy=(new_end.xd, new_end.yd),
+                                     xytext=(start.xd, start.yd), arrowprops=props)
 
         return self
 
@@ -293,7 +299,8 @@ class Visualizer:
         points: list(:class:`foronoi.graph.Point`), optional
             The vertices to display. By default, the `voronoi`'s vertices will be used.
         show_labels: bool
-            Display the labels of the cell points, of format "`P#`", where `#` is the `n`th point from top to bottom.
+            Display the labels of the cell points, of format "`P#`", where `#` is the
+               `n`th point from top to bottom.
         color: str
             Color of the sites in hex format (e.g. "#bdc3c7").
         zorder: int
@@ -314,11 +321,14 @@ class Visualizer:
         # Add descriptions
         if show_labels:
             for point in points:
-                self.canvas.text(point.xd, point.yd, s=f"P{point.name if point.name is not None else ''}", zorder=15)
+                self.canvas.text(point.xd, point.yd,
+                                 s=f"P{point.name if point.name is not None else ''}",
+                                 zorder=15)
 
         return self
 
-    def plot_edges(self, edges=None, sweep_line=None, show_labels=True, color=Colors.EDGE, **kwargs):
+    def plot_edges(self, edges=None, sweep_line=None, show_labels=True, color=Colors.EDGE,
+                   **kwargs):
         """
         Display the borders of the cells.
 
@@ -327,10 +337,11 @@ class Visualizer:
         edges: list(:class:`foronoi.graph.HalfEdge`), optional
             The edges to display. By default, the `voronoi`'s edges will be used.
         sweep_line: Decimal
-            The y-coordinate of the sweep line, used to calculate the positions of unfinished edges. By default, the
-            `voronoi`'s sweep_line will be used.
+            The y-coordinate of the sweep line, used to calculate the positions of unfinished
+            edges. By default, the `voronoi`'s sweep_line will be used.
         show_labels: bool
-            Display edge labels of format "`A/B`", where the edge is `A`'s border and the edge's twin is `B`'s border.
+            Display edge labels of format "`A/B`", where the edge is `A`'s border and the edge's
+             twin is `B`'s border.
         color: str
             Color of the sites in hex format (e.g. "#636e72").
 
@@ -348,7 +359,8 @@ class Visualizer:
 
     def plot_border_to_site(self, edges=None, sweep_line=None):
         """
-        Indicate with dashed line to which site a border belongs. The site's first edge is colored green.
+        Indicate with dashed line to which site a border belongs. The site's first edge is
+         colored green.
 
         Parameters
         ----------
@@ -356,8 +368,8 @@ class Visualizer:
             The edges to display. By default, the `voronoi`'s edges will be used.
 
         sweep_line: Decimal
-            The y-coordinate of the sweep line, used to calculate the positions of unfinished edges. By default, the
-            `voronoi`'s sweep_line will be used.
+            The y-coordinate of the sweep line, used to calculate the positions of unfinished
+             edges. By default, the `voronoi`'s sweep_line will be used.
 
         Returns
         -------
@@ -380,8 +392,8 @@ class Visualizer:
         ----------
         arcs: list(:ref:`Arc`)
         sweep_line: Decimal
-            The y-coordinate of the sweep line, used to calculate the positions of the arcs. By default, the
-            `voronoi`'s sweep_line will be used.
+            The y-coordinate of the sweep line, used to calculate the positions of the arcs.
+            By default, the `voronoi`'s sweep_line will be used.
         plot_arcs: bool
             Display each arc for each point
         show_labels: bool
@@ -396,7 +408,7 @@ class Visualizer:
         sweep_line = sweep_line or self.voronoi.sweep_line
 
         # Get axis limits
-        min_x, max_x, min_y, max_y = self.min_x, self.max_x, self.min_y, self.max_y
+        min_x, max_x, max_y = self.min_x, self.max_x, self.max_y
         sweep_line = max_y if sweep_line is None else sweep_line
 
         # Create 1000 equally spaced points
@@ -431,8 +443,8 @@ class Visualizer:
             obs_x = []
             obs_y = []
             for point in obstacle_poly.points:
-                obs_x.append( point.x )
-                obs_y.append( point.y )
+                obs_x.append(point.x)
+                obs_y.append(point.y)
 
             self.canvas.fill(obs_x, obs_y, color='red', zorder=0)
 
@@ -443,7 +455,8 @@ class Visualizer:
         for index in unique_indices:
             x_mean = np.nanmedian(x[(indices == index) & (bottom < self.max_y)])
             y = arcs[index].get_plot(x_mean, sweep_line)
-            self.canvas.text(x_mean, y, s=f"{arcs[index].origin.name}", size=12, color=Colors.VALID_CIRCLE, zorder=15)
+            self.canvas.text(x_mean, y, s=f"{arcs[index].origin.name}", size=12,
+                             color=Colors.VALID_CIRCLE, zorder=15)
 
         return self
 
@@ -454,7 +467,8 @@ class Visualizer:
         Parameters
         ----------
         sweep_line: Decimal
-            The y-coordinate of the sweep line. By default, the `voronoi`'s sweep_line will be used.
+            The y-coordinate of the sweep line. By default, the `voronoi`'s sweep_line
+             will be used.
 
         Returns
         -------
@@ -463,7 +477,7 @@ class Visualizer:
         sweep_line = sweep_line or self.voronoi.sweep_line
 
         # Get axis limits
-        min_x, max_x, min_y, max_y = self.min_x, self.max_x, self.min_y, self.max_y
+        min_x, max_x = self.min_x, self.max_x
 
         self.canvas.plot([min_x, max_x], [sweep_line, sweep_line], color=Colors.SWEEP_LINE)
 
@@ -500,7 +514,8 @@ class Visualizer:
         self.canvas.add_artist(circle)
 
         if show_triangle:
-            triangle = plt.Polygon(evt._get_triangle(), fill=False, color=Colors.TRIANGLE, linewidth=1)
+            triangle = plt.Polygon(evt._get_triangle(), fill=False, color=Colors.TRIANGLE,
+                                   linewidth=1)
             self.canvas.add_artist(triangle)
 
         points = evt.point_triple
@@ -539,7 +554,8 @@ class Visualizer:
         incident_point = edge.incident_point
         if start and end and incident_point:
             self.canvas.plot(
-                [(start.xd + end.xd) / 2, incident_point.xd], [(start.yd + end.yd) / 2, incident_point.yd],
+                [(start.xd + end.xd) / 2, incident_point.xd], [(start.yd + end.yd) / 2,
+                                                               incident_point.yd],
                 color=Colors.FIRST_EDGE if is_first_edge else Colors.INCIDENT_POINT_POINTER,
                 linestyle="--"
             )

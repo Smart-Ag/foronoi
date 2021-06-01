@@ -25,7 +25,8 @@ class Polygon(Subject):
         max_y = max([p.yd for p in self.points])
         max_x = max([p.xd for p in self.points])
         center = Coordinate((max_x + min_x) / 2, (max_y + min_y) / 2)
-        self.min_y, self.min_x, self.max_y, self.max_x, self.center = min_y, min_x, max_y, max_x, center
+        self.min_y, self.min_x, self.max_y, self.max_x, self.center = min_y, min_x, \
+            max_y, max_x, center
 
         # TODO: remove this? messes up geojsons sometimes
         # self.points = self._order_points(self.points)
@@ -34,13 +35,15 @@ class Polygon(Subject):
             self.polygon_vertices.append(Vertex(point.xd, point.yd))
 
     def _order_points(self, points):
-        clockwise = sorted(points, key=lambda point: (-180 - Algebra.calculate_angle(point, self.center)) % 360)
+        clockwise = sorted(points, key=lambda point: (-180 - Algebra.calculate_angle(
+            point, self.center)) % 360)
         return clockwise
 
     def _get_ordered_vertices(self, vertices):
         vertices = [vertex for vertex in vertices if vertex.xd is not None]
         clockwise = sorted(vertices,
-                           key=lambda vertex: (-180 - Algebra.calculate_angle(vertex, self.center)) % 360)
+                           key=lambda vertex: (-180 - Algebra.calculate_angle(
+                               vertex, self.center)) % 360)
         return clockwise
 
     @staticmethod
@@ -51,7 +54,8 @@ class Polygon(Subject):
 
     def finish_polygon(self, edges, existing_vertices, points):
         """
-        Creates half-edges on the bounding polygon that link with Voronoi diagram's half-edges and existing vertices.
+        Creates half-edges on the bounding polygon that link with Voronoi diagram's
+           half-edges and existing vertices.
 
         Parameters
         ----------
@@ -72,7 +76,7 @@ class Polygon(Subject):
 
         vertices = self._get_ordered_vertices(self.polygon_vertices)
         # vertices = [vertex for vertex in self.polygon_vertices if vertex.xd is not None]
-        vertices = list(vertices) + [vertices[0]]  # <- The extra vertex added here, should be removed later
+        vertices = list(vertices) + [vertices[0]]
         cell = self._get_closest_point(vertices[0], points)
         previous_edge = None
         for index in range(0, len(vertices) - 1):
@@ -119,13 +123,14 @@ class Polygon(Subject):
 
     def finish_edges(self, edges, **kwargs):
         """
-        Clip the edges to the bounding box/polygon, and remove edges and vertices that are fully outside.
-        Inserts vertices at the clipped edges' endings.
+        Clip the edges to the bounding box/polygon, and remove edges and vertices that are
+        fully outside. Inserts vertices at the clipped edges' endings.
 
         Parameters
         ----------
         edges: list(HalfEdge)
-            A list of edges in the Voronoi diagram. Every edge should be presented only by one half edge.
+            A list of edges in the Voronoi diagram. Every edge should be presented only by
+             one half edge.
 
         Returns
         -------
@@ -146,7 +151,8 @@ class Polygon(Subject):
             else:
                 edge.delete()
                 edge.twin.delete()
-                self.notify_observers(Message.DEBUG, payload=f"Edges {edge} and {edge.twin} deleted!")
+                self.notify_observers(Message.DEBUG, payload=f"Edges {edge} and {edge.twin} "
+                                                             f"deleted!")
 
         return resulting_edges
 
@@ -181,9 +187,7 @@ class Polygon(Subject):
 
             cross = dxc * dy1 - dyc * dx1
 
-            # print(cross)
-            # if cross == 0:
-            if abs(cross) < 1: # catches points super close to edge (also bad)
+            if abs(cross) < 1:  # catches points super close to edge (also bad)
                 return True
 
         return False

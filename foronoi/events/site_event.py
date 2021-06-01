@@ -21,7 +21,8 @@ class SiteEvent(Event, Subject):
     @property
     def xd(self):
         """
-        The x-coordinate (in Decimal format) of the point, which functions as the secondary priority of this event.
+        The x-coordinate (in Decimal format) of the point, which functions as the secondary
+        priority of this event.
 
         Returns
         -------
@@ -32,7 +33,8 @@ class SiteEvent(Event, Subject):
     @property
     def yd(self):
         """
-        The y-coordinate (in Decimal format) of the point, which functions as the primary priority of this event.
+        The y-coordinate (in Decimal format) of the point, which functions as the primary
+        priority of this event.
 
         Returns
         -------

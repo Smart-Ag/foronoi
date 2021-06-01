@@ -13,8 +13,8 @@ class DebugObserver(Observer, ABC):
         Parameters
         ----------
         callback: function
-            By default, the DebugObserver prints the debug message. When a callback function is given, it will pass
-            the debug message as string to the callback function.
+            By default, the DebugObserver prints the debug message. When a callback function
+            is given, it will pass the debug message as string to the callback function.
         """
         self.callback = callback or (lambda _: print(_))
 

@@ -22,9 +22,3 @@ class Observer(ABC):
             Any additional keyword arguments
         """
         pass
-
-
-
-
-
-

@@ -1,18 +1,19 @@
-from foronoi.graph.point import Point
 from foronoi.graph.vertex import Vertex
 
 
 class HalfEdge:
     def __init__(self, incident_point, twin=None, origin=None):
         """
-        Edges are normally treated as undirected and shared between faces. However, for some tasks (such as simplifying
-        or cleaning geometry) it is useful to view faces as each having their own edges.
-        You can think of this as splitting each shared undirected edge along its length into two half edges.
-        (Boundary edges of course will only have one "half-edge".)
+        Edges are normally treated as undirected and shared between faces. However, for some
+        tasks (such as simplifying or cleaning geometry) it is useful to view faces as each
+        having their own edges.
+        You can think of this as splitting each shared undirected edge along its length into
+        two half edges. (Boundary edges of course will only have one "half-edge".)
         Each half-edge is directed (it has a start vertex and an end vertex).
 
-        The half-edge properties let you quickly find a half-edge’s source and destination vertex, the next half-edge,
-        get the other half-edge from the same edge, find all half-edges sharing a given point, and other manipulations.
+        The half-edge properties let you quickly find a half-edge’s source and destination vertex,
+        the next half-edge, get the other half-edge from the same edge, find all half-edges
+        sharing a given point, and other manipulations.
 
         Examples
         --------
@@ -44,8 +45,8 @@ class HalfEdge:
         twin: HalfEdge
             The other half-edge from the same edge
         origin: Breakpoint or Vertex
-            The origin of the half edge. Can be a Breakpoint or a Vertex during construction, and only Vertex when
-            the diagram is finished.
+            The origin of the half edge. Can be a Breakpoint or a Vertex during construction,
+            and only Vertex when the diagram is finished.
 
         Attributes
         ----------
@@ -78,7 +79,8 @@ class HalfEdge:
 
     def set_next(self, next):
         """
-        Update the `next`-property for this edge and set the `prev`-property on the `next`-edge to the current edge.
+        Update the `next`-property for this edge and set the `prev`-property on the `next`-edge
+           to the current edge.
 
         Parameters
         ----------
@@ -92,9 +94,10 @@ class HalfEdge:
     def get_origin(self, y=None, max_y=None):
         """
         Get the coordinates of the edge's origin.
-        During construction of the Voronoi diagram, the origin can be a vertex, which has a fixed location, or a
-        breakpoint, which is a breakpoint between two moving arcs. In the latter case, we need to calculate the
-        position based on the `y`-coordinate of the sweep line.
+        During construction of the Voronoi diagram, the origin can be a vertex, which has a
+        fixed location, or a breakpoint, which is a breakpoint between two moving arcs. In
+        the latter case, we need to calculate the position based on the `y`-coordinate
+        of the sweep line.
 
         Parameters
         ----------
@@ -150,8 +153,8 @@ class HalfEdge:
 
     def delete(self):
         """
-        Delete this half edge by pointing the previous edge to the next, and removing it from the origin's
-        connected edges list.
+        Delete this half edge by pointing the previous edge to the next, and removing
+        it from the origin's connected edges list.
         """
 
         # Remove the edge from the vertex' connected edges list

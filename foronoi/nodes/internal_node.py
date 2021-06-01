@@ -1,4 +1,5 @@
 from foronoi.tree.node import Node
+from foronoi.nodes import Breakpoint
 
 
 class InternalNode(Node):

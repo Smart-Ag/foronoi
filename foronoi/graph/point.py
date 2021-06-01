@@ -80,7 +80,8 @@ class Point(Coordinate):
         Returns
         -------
         edges: list(HalfEdge) or None
-            The list of borders, or None if not all borders are present (when the voronoi diagram is under construction)
+            The list of borders, or None if not all borders are present (when the
+                    voronoi diagram is under construction)
         """
 
         if self.first_edge is None:
@@ -101,8 +102,8 @@ class Point(Coordinate):
         Returns
         -------
         vertices: list(Vertex) or None
-            The list of vertices, or None if not all borders are present (when the voronoi diagram is under
-            construction)
+            The list of vertices, or None if not all borders are present (when the
+            voronoi diagram is under construction)
         """
         borders = self.borders()
         if borders is None:

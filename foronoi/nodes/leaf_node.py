@@ -17,5 +17,3 @@ class LeafNode(Node):
 
     def get_label(self):
         return f"{self.data.origin.name}"
-
-

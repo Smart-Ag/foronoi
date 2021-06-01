@@ -52,7 +52,8 @@ class Algebra:
         if not orig or not end:
             return None
 
-        point = Algebra.line_ray_intersection_point([orig.xd, orig.yd], [end.xd, end.yd], [p1.xd, p1.yd], [p2.xd, p2.yd])
+        point = Algebra.line_ray_intersection_point([orig.xd, orig.yd], [end.xd, end.yd],
+                                                    [p1.xd, p1.yd], [p2.xd, p2.yd])
 
         if len(point) == 0:
             return None
