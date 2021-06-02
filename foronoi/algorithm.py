@@ -220,7 +220,6 @@ class Algorithm(Subject):
             self.event = event
             self.notify_observers(Message.STEP_FINISHED)
 
-            print(index)
 
         self.notify_observers(Message.DEBUG, payload="# Sweep finished")
         self.notify_observers(Message.SWEEP_FINISHED)
