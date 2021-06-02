@@ -16,7 +16,6 @@ class Polygon(Subject):
         tuples: list[(float, float)]
             x,y-coordinates of the polygon's vertices
         """
-
         super().__init__()
         points = [Coordinate(x, y) for x, y in tuples]
         self.points = points
@@ -135,12 +134,6 @@ class Polygon(Subject):
         resulting_edges = list()
         for edge in edges:
 
-            if edge.get_origin() is None or not self.inside(edge.get_origin()):
-                self._finish_edge(edge)
-
-            if edge.twin.get_origin() is None or not self.inside(edge.twin.get_origin()):
-                self._finish_edge(edge.twin)
-
             if edge.get_origin() is not None and edge.twin.get_origin() is not None:
                 resulting_edges.append(edge)
             else:
@@ -181,9 +174,9 @@ class Polygon(Subject):
 
             cross = dxc * dy1 - dyc * dx1
 
-            # print(cross)
+            print(cross)
             # if cross == 0:
-            if abs(cross) < 1: # catches points super close to edge (also bad)
+            if abs(cross) < 1:  # catches points super close to edge (also bad)
                 return True
 
         return False

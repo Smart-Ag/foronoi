@@ -217,8 +217,6 @@ class Algorithm(Subject):
             self.event = event
             self.notify_observers(Message.STEP_FINISHED)
 
-            print(index)
-
 
         self.notify_observers(Message.DEBUG, payload="# Sweep finished")
         self.notify_observers(Message.SWEEP_FINISHED)
@@ -228,7 +226,12 @@ class Algorithm(Subject):
             edges=self.edges, vertices=self._vertices, points=self.sites, event_queue=self.event_queue
         )
 
-        self.edges, self._vertices = self.bounding_poly.finish_polygon(self.edges, self._vertices, self.sites)
+        # self.edges, self._vertices = self.bounding_poly.finish_polygon(self.edges, self._vertices, self.sites)
+        # for edge in self.edges:
+        #     if isinstance(edge.origin, Breakpoint) or isinstance(edge.target, Breakpoint):
+        #         edge.delete()
+        #     elif not self.bounding_poly.inside(edge.origin) or not self.bounding_poly.inside(edge.target):
+        #         edge.delete()
 
         if self.remove_zero_length_edges:
             self.clean_up_zero_length_edges()
