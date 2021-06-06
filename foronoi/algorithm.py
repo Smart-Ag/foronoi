@@ -123,7 +123,7 @@ class Algorithm(Subject):
 
         return self.event_queue
 
-    def create_diagram(self, obstacle_polys: list):
+    def create_diagram(self, obstacle_polys: list, projected_points=None):
         """
         Create the Voronoi diagram.
 
@@ -161,6 +161,10 @@ class Algorithm(Subject):
         for obstacle in obstacle_polys:
             for coord in obstacle.points:
                 points.append(Point(coord.x, coord.y))
+
+        if projected_points is not None:
+            for point in projected_points:
+                points.append(Point(point[0], point[1]))
 
         # store for collision detection (of graph nodes & edges) later on
         self.obstacle_polygons = obstacle_polys
